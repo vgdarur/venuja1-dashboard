@@ -22,32 +22,38 @@ function AppRouter() {
   );
 }
 
-function App() {
+function AppLayout() {
   const sidebarStyle = {
     "--sidebar-width": "16rem",
     "--sidebar-width-icon": "3rem",
   };
 
   return (
+    <SidebarProvider style={sidebarStyle as React.CSSProperties}>
+      <div className="flex h-screen w-full overflow-hidden">
+        <AppSidebar />
+        <div className="flex flex-col flex-1 min-w-0">
+          <header className="flex items-center justify-between px-4 py-2 border-b shrink-0">
+            <SidebarTrigger data-testid="button-sidebar-toggle" />
+            <ThemeToggle />
+          </header>
+          <main className="flex-1 overflow-y-auto">
+            <AppRouter />
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>
+  );
+}
+
+function App() {
+  return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <SidebarProvider style={sidebarStyle as React.CSSProperties}>
-            <div className="flex h-screen w-full overflow-hidden">
-              <AppSidebar />
-              <div className="flex flex-col flex-1 min-w-0">
-                <header className="flex items-center justify-between px-4 py-2 border-b shrink-0">
-                  <SidebarTrigger data-testid="button-sidebar-toggle" />
-                  <ThemeToggle />
-                </header>
-                <main className="flex-1 overflow-y-auto">
-                  <Router hook={useHashLocation}>
-                    <AppRouter />
-                  </Router>
-                </main>
-              </div>
-            </div>
-          </SidebarProvider>
+          <Router hook={useHashLocation}>
+            <AppLayout />
+          </Router>
           <Toaster />
         </TooltipProvider>
       </QueryClientProvider>
