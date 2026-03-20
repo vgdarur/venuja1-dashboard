@@ -2,11 +2,16 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertJobSchema } from "@shared/schema";
+import { requireAuth } from "./auth";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // Protect all job routes
+  app.use("/api/jobs", requireAuth);
+  app.use("/api/stats", requireAuth);
+
   // GET /api/jobs — list all jobs, optionally filter by status
   app.get("/api/jobs", async (req, res) => {
     try {
