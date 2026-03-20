@@ -6,8 +6,8 @@ import MemoryStore from "memorystore";
 // Allowed email — only Venu can access
 const ALLOWED_EMAIL = "vgdarur@gmail.com";
 
-// Google OAuth client ID — will be set via env var or fallback
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
+// Google OAuth client ID
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "829752059628-cb29j0ra1l8litg13a1pnl900brkki1q.apps.googleusercontent.com";
 
 const oauthClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
