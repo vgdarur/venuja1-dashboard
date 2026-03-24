@@ -7,10 +7,17 @@ import MemoryStore from "memorystore";
 const ALLOWED_EMAIL = "vgdarur@gmail.com";
 
 // API key for programmatic access (VenuJA1 cron job)
-const API_KEY = process.env.VENUJA1_API_KEY || "vnj1-ak-8f3d2a7e9b1c4056";
+// Must be set via VENUJA1_API_KEY environment variable
+const API_KEY = process.env.VENUJA1_API_KEY;
+if (!API_KEY) {
+  console.warn("⚠️  VENUJA1_API_KEY not set — programmatic API access will be disabled");
+}
 
-// Google OAuth client ID
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "829752059628-cb29j0ra1l8litg13a1pnl900brkki1q.apps.googleusercontent.com";
+// Google OAuth client ID — must be set via environment variable
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+if (!GOOGLE_CLIENT_ID) {
+  throw new Error("GOOGLE_CLIENT_ID environment variable is required.");
+}
 
 const oauthClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
@@ -30,7 +37,7 @@ export function setupAuth(app: Express) {
 
   app.use(
     session({
-      secret: process.env.SESSION_SECRET || "venuja1-dashboard-secret-key-2026",
+      secret: process.env.SESSION_SECRET || require("crypto").randomBytes(32).toString("hex"),
       resave: false,
       saveUninitialized: false,
       cookie: {
@@ -122,11 +129,13 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   }
 
   // Check API key (programmatic access from VenuJA1 cron)
-  const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    const token = authHeader.slice(7);
-    if (token === API_KEY) {
-      return next();
+  if (API_KEY) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.slice(7);
+      if (token === API_KEY) {
+        return next();
+      }
     }
   }
 
