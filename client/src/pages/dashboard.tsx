@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -8,7 +9,7 @@ import {
   MessageSquare,
   Trophy,
   SkipForward,
-  Clock,
+  Bot,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -31,6 +32,20 @@ const STATUS_COLORS: Record<string, string> = {
   interview: "#3b82f6",
   offer: "#a855f7",
   rejected: "#ef4444",
+};
+
+const AGENT_TABS = [
+  { key: "all", label: "All Agents", color: "hsl(174 72% 46%)" },
+  { key: "venuja1", label: "VenuJA1", color: "hsl(174 72% 46%)" },
+  { key: "krishnaja1", label: "KrishnaJA1", color: "hsl(262 72% 56%)" },
+  { key: "udayja1", label: "UdayJA1", color: "hsl(38 92% 50%)" },
+];
+
+const AGENT_DETAILS: Record<string, { candidate: string; type: string }> = {
+  all: { candidate: "All Candidates", type: "All job types" },
+  venuja1: { candidate: "Venu Darur", type: "W2 Full-time · Atlanta + Remote" },
+  krishnaja1: { candidate: "V Krishna", type: "C2C Contract · Dallas + Remote" },
+  udayja1: { candidate: "Uday Kumar Chitturi", type: "C2C Contract · Atlanta + Remote + USA" },
 };
 
 function KpiCard({
@@ -60,7 +75,6 @@ function KpiCard({
               <p
                 className="text-xl font-bold tabular-nums"
                 style={accent ? { color: accent } : undefined}
-                data-testid={`kpi-${title.toLowerCase().replace(/\s/g, "-")}`}
               >
                 {value}
               </p>
@@ -76,7 +90,6 @@ function KpiCard({
 }
 
 function ApplicationsChart({ jobs, loading }: { jobs: Job[]; loading: boolean }) {
-  // Group by date over last 30 days
   const now = new Date();
   const days: { date: string; count: number }[] = [];
   for (let i = 29; i >= 0; i--) {
@@ -85,8 +98,8 @@ function ApplicationsChart({ jobs, loading }: { jobs: Job[]; loading: boolean })
     const key = d.toISOString().slice(0, 10);
     const label = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
     const count = jobs.filter((j) => {
-      if (!j.applied_date) return false;
-      return new Date(j.applied_date).toISOString().slice(0, 10) === key;
+      const created = new Date(j.created_at).toISOString().slice(0, 10);
+      return created === key;
     }).length;
     days.push({ date: label, count });
   }
@@ -170,6 +183,10 @@ function StatusDistribution({ jobs, loading }: { jobs: Job[]; loading: boolean }
       <CardContent className="pt-0">
         {loading ? (
           <Skeleton className="h-[200px] w-full" />
+        ) : statusCounts.length === 0 ? (
+          <div className="h-[200px] flex items-center justify-center text-sm text-muted-foreground">
+            No jobs yet
+          </div>
         ) : (
           <div className="flex items-center gap-4">
             <ResponsiveContainer width="50%" height={200}>
@@ -228,6 +245,18 @@ function RecentActivity({ jobs, loading }: { jobs: Job[]; loading: boolean }) {
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 10);
 
+  const agentColors: Record<string, string> = {
+    venuja1: "hsl(174 72% 46%)",
+    krishnaja1: "hsl(262 72% 56%)",
+    udayja1: "hsl(38 92% 50%)",
+  };
+
+  const agentLabels: Record<string, string> = {
+    venuja1: "VenuJA1",
+    krishnaja1: "KrishnaJA1",
+    udayja1: "UdayJA1",
+  };
+
   return (
     <Card className="border-card-border col-span-full">
       <CardHeader className="pb-2">
@@ -241,18 +270,34 @@ function RecentActivity({ jobs, loading }: { jobs: Job[]; loading: boolean }) {
               <Skeleton key={i} className="h-10 w-full" />
             ))}
           </div>
+        ) : recent.length === 0 ? (
+          <div className="py-8 text-center text-sm text-muted-foreground">
+            No jobs found for this agent
+          </div>
         ) : (
           <div className="space-y-1">
             {recent.map((job) => (
               <div
                 key={job.id}
                 className="flex items-center justify-between py-2 px-2 rounded-md hover:bg-muted/50 transition-colors"
-                data-testid={`activity-job-${job.id}`}
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate">{job.title}</p>
-                    <p className="text-[11px] text-muted-foreground">{job.company}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-[11px] text-muted-foreground">{job.company}</p>
+                      {job.agent && (
+                        <span
+                          className="text-[10px] font-medium px-1.5 py-0.5 rounded-full"
+                          style={{
+                            background: `${agentColors[job.agent] || "#71717a"}20`,
+                            color: agentColors[job.agent] || "#71717a",
+                          }}
+                        >
+                          {agentLabels[job.agent] || job.agent}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
@@ -271,6 +316,10 @@ function RecentActivity({ jobs, loading }: { jobs: Job[]; loading: boolean }) {
 }
 
 export default function DashboardPage() {
+  const [selectedAgent, setSelectedAgent] = useState("all");
+
+  const agentParam = selectedAgent === "all" ? "" : `?agent=${selectedAgent}`;
+
   const { data: stats, isLoading: statsLoading } = useQuery<{
     total: number;
     applied: number;
@@ -280,24 +329,56 @@ export default function DashboardPage() {
     pending: number;
     rejected: number;
   }>({
-    queryKey: ["/api/stats"],
+    queryKey: ["/api/stats" + agentParam],
   });
 
   const { data: jobs = [], isLoading: jobsLoading } = useQuery<Job[]>({
-    queryKey: ["/api/jobs"],
+    queryKey: ["/api/jobs" + agentParam],
     queryFn: async () => {
-      const res = await apiRequest("GET", "/api/jobs");
+      const res = await apiRequest("GET", "/api/jobs" + agentParam);
       return res.json();
     },
   });
+
+  const details = AGENT_DETAILS[selectedAgent];
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <div>
         <h2 className="text-lg font-bold">Dashboard</h2>
         <p className="text-xs text-muted-foreground">
-          VenuJA1 agent activity overview — Venu Darur
+          {details.candidate} — {details.type}
         </p>
+      </div>
+
+      {/* Agent Selector Tabs */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {AGENT_TABS.map((tab) => {
+          const isActive = selectedAgent === tab.key;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setSelectedAgent(tab.key)}
+              className={`
+                inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                transition-all duration-200 border
+                ${
+                  isActive
+                    ? "border-transparent text-white shadow-sm"
+                    : "border-border text-muted-foreground hover:text-foreground hover:border-muted-foreground/50 bg-transparent"
+                }
+              `}
+              style={
+                isActive
+                  ? { background: tab.color }
+                  : undefined
+              }
+            >
+              <Bot className="h-3.5 w-3.5" />
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* KPI Cards */}

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/components/status-badge";
@@ -23,6 +23,7 @@ import {
 import {
   ArrowUpDown,
   ExternalLink,
+  Bot,
 } from "lucide-react";
 import type { Job } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
@@ -40,16 +41,38 @@ const statusOptions = [
   { value: "rejected", label: "Rejected" },
 ];
 
+const agentOptions = [
+  { value: "all", label: "All Agents" },
+  { value: "venuja1", label: "VenuJA1" },
+  { value: "krishnaja1", label: "KrishnaJA1" },
+  { value: "udayja1", label: "UdayJA1" },
+];
+
+const agentColors: Record<string, string> = {
+  venuja1: "hsl(174 72% 46%)",
+  krishnaja1: "hsl(262 72% 56%)",
+  udayja1: "hsl(38 92% 50%)",
+};
+
+const agentLabels: Record<string, string> = {
+  venuja1: "VenuJA1",
+  krishnaja1: "KrishnaJA1",
+  udayja1: "UdayJA1",
+};
+
 export default function JobsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
+  const [agentFilter, setAgentFilter] = useState("all");
   const [sortKey, setSortKey] = useState<SortKey>("created_at");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
 
+  const agentParam = agentFilter === "all" ? "" : `?agent=${agentFilter}`;
+
   const { data: jobs = [], isLoading } = useQuery<Job[]>({
-    queryKey: ["/api/jobs"],
+    queryKey: ["/api/jobs" + agentParam],
     queryFn: async () => {
-      const res = await apiRequest("GET", "/api/jobs");
+      const res = await apiRequest("GET", "/api/jobs" + agentParam);
       return res.json();
     },
   });
@@ -91,7 +114,6 @@ export default function JobsPage() {
         size="sm"
         className="h-auto p-0 font-medium text-xs hover:bg-transparent"
         onClick={() => toggleSort(column)}
-        data-testid={`sort-${column}`}
       >
         {label}
         <ArrowUpDown className="ml-1 h-3 w-3" />
@@ -101,31 +123,40 @@ export default function JobsPage() {
 
   return (
     <div className="p-6 space-y-4 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-lg font-bold">Jobs</h2>
           <p className="text-xs text-muted-foreground">
             {filtered.length} of {jobs.length} jobs
           </p>
         </div>
-        <Select
-          value={statusFilter}
-          onValueChange={setStatusFilter}
-        >
-          <SelectTrigger
-            className="w-[160px] h-8 text-xs"
-            data-testid="select-status-filter"
-          >
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {statusOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Select value={agentFilter} onValueChange={setAgentFilter}>
+            <SelectTrigger className="w-[150px] h-8 text-xs">
+              <Bot className="h-3 w-3 mr-1" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {agentOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[150px] h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <Card className="border-card-border">
@@ -141,7 +172,8 @@ export default function JobsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[280px]">
+                    <TableHead className="w-[60px]">Agent</TableHead>
+                    <TableHead className="w-[260px]">
                       <SortButton column="title" label="Title" />
                     </TableHead>
                     <TableHead>
@@ -165,9 +197,19 @@ export default function JobsPage() {
                       key={job.id}
                       className="cursor-pointer hover:bg-muted/50 transition-colors"
                       onClick={() => setSelectedJobId(job.id)}
-                      data-testid={`row-job-${job.id}`}
                     >
-                      <TableCell className="font-medium text-sm max-w-[280px] truncate">
+                      <TableCell>
+                        <span
+                          className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full whitespace-nowrap"
+                          style={{
+                            background: `${agentColors[job.agent] || "#71717a"}20`,
+                            color: agentColors[job.agent] || "#71717a",
+                          }}
+                        >
+                          {agentLabels[job.agent] || job.agent || "—"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="font-medium text-sm max-w-[260px] truncate">
                         {job.title}
                       </TableCell>
                       <TableCell className="text-sm">{job.company}</TableCell>
@@ -206,7 +248,6 @@ export default function JobsPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            data-testid={`link-job-url-${job.id}`}
                           >
                             <ExternalLink className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground transition-colors" />
                           </a>
@@ -217,10 +258,10 @@ export default function JobsPage() {
                   {filtered.length === 0 && (
                     <TableRow>
                       <TableCell
-                        colSpan={8}
+                        colSpan={9}
                         className="text-center text-sm text-muted-foreground py-12"
                       >
-                        No jobs found matching the current filter.
+                        No jobs found matching the current filters.
                       </TableCell>
                     </TableRow>
                   )}

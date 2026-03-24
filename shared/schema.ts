@@ -2,6 +2,9 @@ import { pgTable, serial, text, integer, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+export const AGENTS = ["venuja1", "krishnaja1", "udayja1"] as const;
+export type AgentName = (typeof AGENTS)[number];
+
 export const jobs = pgTable("jobs", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
@@ -14,6 +17,7 @@ export const jobs = pgTable("jobs", {
   applied_date: timestamp("applied_date"),
   created_at: timestamp("created_at").defaultNow().notNull(),
   notes: text("notes"),
+  agent: text("agent").notNull().default("venuja1"),
 });
 
 export const insertJobSchema = createInsertSchema(jobs).omit({

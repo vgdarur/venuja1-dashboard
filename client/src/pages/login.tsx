@@ -74,7 +74,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Card className="w-[400px] border-border/50">
         <CardHeader className="text-center space-y-4 pb-2">
-          {/* VenuJA1 Logo */}
+          {/* Balaji Agent Hub Logo */}
           <div className="flex justify-center">
             <svg
               width="64"
@@ -82,7 +82,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
               viewBox="0 0 48 48"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              aria-label="VenuJA1 Logo"
+              aria-label="Balaji Agent Hub Logo"
             >
               <rect
                 x="4"
@@ -94,25 +94,15 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                 strokeWidth="2.5"
                 className="text-primary"
               />
-              <path
-                d="M14 16L24 32L34 16"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-primary"
-              />
-              <circle
-                cx="24"
-                cy="14"
-                r="2.5"
-                fill="currentColor"
-                className="text-primary"
-              />
+              <circle cx="16" cy="24" r="4" fill="currentColor" className="text-primary" />
+              <circle cx="32" cy="16" r="4" fill="currentColor" className="text-primary" />
+              <circle cx="32" cy="32" r="4" fill="currentColor" className="text-primary" />
+              <line x1="19.5" y1="22.5" x2="28.5" y2="17.5" stroke="currentColor" strokeWidth="2" className="text-primary" />
+              <line x1="19.5" y1="25.5" x2="28.5" y2="30.5" stroke="currentColor" strokeWidth="2" className="text-primary" />
             </svg>
           </div>
           <div>
-            <h1 className="text-xl font-semibold tracking-tight">VenuJA1</h1>
+            <h1 className="text-xl font-semibold tracking-tight">Balaji Agent Hub</h1>
             <p className="text-sm text-muted-foreground mt-1">
               Job Agent Dashboard
             </p>

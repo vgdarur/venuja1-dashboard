@@ -1,4 +1,4 @@
-import { LayoutDashboard, Briefcase, Bot } from "lucide-react";
+import { LayoutDashboard, Briefcase, Bot, Users } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import {
   Sidebar,
@@ -19,7 +19,13 @@ const navItems = [
   { title: "Jobs", url: "/jobs", icon: Briefcase },
 ];
 
-function VenuJA1Logo() {
+const AGENT_INFO: Record<string, { label: string; candidate: string; type: string; color: string }> = {
+  venuja1: { label: "VenuJA1", candidate: "Venu Darur", type: "W2 Full-time", color: "hsl(174 72% 46%)" },
+  krishnaja1: { label: "KrishnaJA1", candidate: "V Krishna", type: "C2C Contract", color: "hsl(262 72% 56%)" },
+  udayja1: { label: "UdayJA1", candidate: "Uday Kumar Chitturi", type: "C2C Contract", color: "hsl(38 92% 50%)" },
+};
+
+function AgentHubLogo() {
   return (
     <svg
       width="32"
@@ -27,17 +33,14 @@ function VenuJA1Logo() {
       viewBox="0 0 32 32"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      aria-label="VenuJA1 Logo"
+      aria-label="Agent Hub Logo"
     >
       <rect width="32" height="32" rx="8" fill="hsl(174 72% 46%)" />
-      <path
-        d="M8 10L16 22L24 10"
-        stroke="hsl(220 16% 6%)"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="24" cy="10" r="3" fill="hsl(220 16% 6%)" />
+      <circle cx="10" cy="16" r="3" fill="hsl(220 16% 6%)" />
+      <circle cx="22" cy="10" r="3" fill="hsl(220 16% 6%)" />
+      <circle cx="22" cy="22" r="3" fill="hsl(220 16% 6%)" />
+      <line x1="12.5" y1="15" x2="19.5" y2="11" stroke="hsl(220 16% 6%)" strokeWidth="1.5" />
+      <line x1="12.5" y1="17" x2="19.5" y2="21" stroke="hsl(220 16% 6%)" strokeWidth="1.5" />
     </svg>
   );
 }
@@ -49,9 +52,9 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader className="px-4 py-5">
         <div className="flex items-center gap-3">
-          <VenuJA1Logo />
+          <AgentHubLogo />
           <div>
-            <h1 className="text-sm font-bold tracking-tight">VenuJA1</h1>
+            <h1 className="text-sm font-bold tracking-tight">Balaji Agent Hub</h1>
             <p className="text-[11px] text-muted-foreground">Job Agent Dashboard</p>
           </div>
         </div>
@@ -86,18 +89,27 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Agent Info</SidebarGroupLabel>
+          <SidebarGroupLabel>
+            <Users className="h-3.5 w-3.5 mr-1.5" />
+            Agents
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <div className="px-3 py-2 space-y-2">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Bot className="h-3.5 w-3.5 text-primary" />
-                <span>Agent: VenuJA1</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-                <span>Status: Active</span>
-              </div>
-              <div className="text-[11px] text-muted-foreground/70 mt-1">
+            <div className="px-3 py-2 space-y-3">
+              {Object.entries(AGENT_INFO).map(([key, info]) => (
+                <div key={key} className="space-y-0.5">
+                  <div className="flex items-center gap-2 text-xs">
+                    <div
+                      className="h-2 w-2 rounded-full"
+                      style={{ background: info.color }}
+                    />
+                    <span className="font-medium">{info.label}</span>
+                  </div>
+                  <div className="pl-4 text-[11px] text-muted-foreground">
+                    {info.candidate} · {info.type}
+                  </div>
+                </div>
+              ))}
+              <div className="pt-1 text-[11px] text-muted-foreground/70 border-t border-border mt-2">
                 Coordinator: Balaji
               </div>
             </div>

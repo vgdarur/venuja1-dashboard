@@ -1,17 +1,17 @@
 import { type Job, type InsertJob, jobs } from "@shared/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 
 const { Pool } = pg;
 
 export interface IStorage {
-  getJobs(status?: string): Promise<Job[]>;
+  getJobs(status?: string, agent?: string): Promise<Job[]>;
   getJob(id: number): Promise<Job | undefined>;
   createJob(job: InsertJob): Promise<Job>;
   updateJob(id: number, updates: Partial<InsertJob>): Promise<Job | undefined>;
   deleteJob(id: number): Promise<boolean>;
-  getStats(): Promise<{
+  getStats(agent?: string): Promise<{
     total: number;
     applied: number;
     interviews: number;
@@ -22,7 +22,6 @@ export interface IStorage {
   }>;
 }
 
-// Persistent PostgreSQL storage using Drizzle ORM + Neon
 export class PgStorage implements IStorage {
   private db;
 
@@ -34,12 +33,16 @@ export class PgStorage implements IStorage {
     this.db = drizzle(pool);
   }
 
-  async getJobs(status?: string): Promise<Job[]> {
-    if (status) {
+  async getJobs(status?: string, agent?: string): Promise<Job[]> {
+    const conditions = [];
+    if (status) conditions.push(eq(jobs.status, status));
+    if (agent && agent !== "all") conditions.push(eq(jobs.agent, agent));
+
+    if (conditions.length > 0) {
       return this.db
         .select()
         .from(jobs)
-        .where(eq(jobs.status, status))
+        .where(conditions.length === 1 ? conditions[0] : and(...conditions))
         .orderBy(desc(jobs.created_at));
     }
     return this.db
@@ -71,6 +74,7 @@ export class PgStorage implements IStorage {
           ? new Date(insertJob.applied_date)
           : null,
         notes: insertJob.notes ?? null,
+        agent: insertJob.agent ?? "venuja1",
       })
       .returning();
     return result[0];
@@ -95,6 +99,7 @@ export class PgStorage implements IStorage {
         ? new Date(updates.applied_date)
         : null;
     if (updates.notes !== undefined) updateData.notes = updates.notes;
+    if (updates.agent !== undefined) updateData.agent = updates.agent;
 
     if (Object.keys(updateData).length === 0) {
       return this.getJob(id);
@@ -116,8 +121,17 @@ export class PgStorage implements IStorage {
     return result.length > 0;
   }
 
-  async getStats() {
-    const allJobs = await this.db.select().from(jobs);
+  async getStats(agent?: string) {
+    let allJobs: Job[];
+    if (agent && agent !== "all") {
+      allJobs = await this.db
+        .select()
+        .from(jobs)
+        .where(eq(jobs.agent, agent));
+    } else {
+      allJobs = await this.db.select().from(jobs);
+    }
+
     const total = allJobs.length;
     const applied = allJobs.filter((j) => j.status === "applied").length;
     const interviews = allJobs.filter((j) => j.status === "interview").length;
@@ -132,8 +146,6 @@ export class PgStorage implements IStorage {
 }
 
 // --- Storage initialization ---
-// DATABASE_URL must be set as an environment variable (e.g. in Cloud Run)
-// Never hardcode database credentials in source code.
 const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!DATABASE_URL) {
