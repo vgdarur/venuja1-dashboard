@@ -12,6 +12,9 @@ const ALLOWED_EMAILS = [
   "vamshinv9@gmail.com",              // Vamshi
   "shashidevops6@gmail.com",          // Shashi (ShasheeJA1)
   "rajavamshisvln@gmail.com",         // Raja Vamshi (RajJA1)
+  "dunti0001@gmail.com",              // Dunteesh (DunteesJA1)
+  "purvat.111@gmail.com",             // Purva (PurvaJA1)
+  "karetiramanakumar@gmail.com",      // Ramana (RamanaJA1)
 ];
 
 // API key for programmatic access (VenuJA1 cron job)

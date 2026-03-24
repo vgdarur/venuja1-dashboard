@@ -48,6 +48,9 @@ const agentOptions = [
   { value: "udayja1", label: "UdayJA1" },
   { value: "shasheeja1", label: "ShasheeJA1" },
   { value: "rajja1", label: "RajJA1" },
+  { value: "dunteesja1", label: "DunteesJA1" },
+  { value: "purvaja1", label: "PurvaJA1" },
+  { value: "ramanaja1", label: "RamanaJA1" },
 ];
 
 const agentColors: Record<string, string> = {
@@ -56,6 +59,9 @@ const agentColors: Record<string, string> = {
   udayja1: "hsl(38 92% 50%)",
   shasheeja1: "hsl(340 75% 55%)",
   rajja1: "hsl(200 80% 50%)",
+  dunteesja1: "hsl(25 90% 55%)",
+  purvaja1: "hsl(290 70% 55%)",
+  ramanaja1: "hsl(150 70% 45%)",
 };
 
 const agentLabels: Record<string, string> = {
@@ -64,6 +70,9 @@ const agentLabels: Record<string, string> = {
   udayja1: "UdayJA1",
   shasheeja1: "ShasheeJA1",
   rajja1: "RajJA1",
+  dunteesja1: "DunteesJA1",
+  purvaja1: "PurvaJA1",
+  ramanaja1: "RamanaJA1",
 };
 
 export default function JobsPage() {

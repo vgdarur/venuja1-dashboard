@@ -2,7 +2,7 @@ import { pgTable, serial, text, integer, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const AGENTS = ["venuja1", "krishnaja1", "udayja1", "shasheeja1", "rajja1"] as const;
+export const AGENTS = ["venuja1", "krishnaja1", "udayja1", "shasheeja1", "rajja1", "dunteesja1", "purvaja1", "ramanaja1"] as const;
 export type AgentName = (typeof AGENTS)[number];
 
 export const jobs = pgTable("jobs", {
