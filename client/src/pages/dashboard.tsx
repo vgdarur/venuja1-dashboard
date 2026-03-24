@@ -39,6 +39,8 @@ const AGENT_TABS = [
   { key: "venuja1", label: "VenuJA1", color: "hsl(174 72% 46%)" },
   { key: "krishnaja1", label: "KrishnaJA1", color: "hsl(262 72% 56%)" },
   { key: "udayja1", label: "UdayJA1", color: "hsl(38 92% 50%)" },
+  { key: "shasheeja1", label: "ShasheeJA1", color: "hsl(340 75% 55%)" },
+  { key: "rajja1", label: "RajJA1", color: "hsl(200 80% 50%)" },
 ];
 
 const AGENT_DETAILS: Record<string, { candidate: string; type: string }> = {
@@ -46,6 +48,8 @@ const AGENT_DETAILS: Record<string, { candidate: string; type: string }> = {
   venuja1: { candidate: "Venu Darur", type: "W2 Full-time · Atlanta + Remote" },
   krishnaja1: { candidate: "V Krishna", type: "C2C Contract · Dallas + Remote" },
   udayja1: { candidate: "Uday Kumar Chitturi", type: "C2C Contract · Atlanta + Remote + USA" },
+  shasheeja1: { candidate: "Shashi Kumar", type: "C2C Contract · DevOps/SRE" },
+  rajja1: { candidate: "Raja Vamshi", type: "C2C Contract · Java Fullstack" },
 };
 
 function KpiCard({
@@ -249,12 +253,16 @@ function RecentActivity({ jobs, loading }: { jobs: Job[]; loading: boolean }) {
     venuja1: "hsl(174 72% 46%)",
     krishnaja1: "hsl(262 72% 56%)",
     udayja1: "hsl(38 92% 50%)",
+    shasheeja1: "hsl(340 75% 55%)",
+    rajja1: "hsl(200 80% 50%)",
   };
 
   const agentLabels: Record<string, string> = {
     venuja1: "VenuJA1",
     krishnaja1: "KrishnaJA1",
     udayja1: "UdayJA1",
+    shasheeja1: "ShasheeJA1",
+    rajja1: "RajJA1",
   };
 
   return (

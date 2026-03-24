@@ -46,18 +46,24 @@ const agentOptions = [
   { value: "venuja1", label: "VenuJA1" },
   { value: "krishnaja1", label: "KrishnaJA1" },
   { value: "udayja1", label: "UdayJA1" },
+  { value: "shasheeja1", label: "ShasheeJA1" },
+  { value: "rajja1", label: "RajJA1" },
 ];
 
 const agentColors: Record<string, string> = {
   venuja1: "hsl(174 72% 46%)",
   krishnaja1: "hsl(262 72% 56%)",
   udayja1: "hsl(38 92% 50%)",
+  shasheeja1: "hsl(340 75% 55%)",
+  rajja1: "hsl(200 80% 50%)",
 };
 
 const agentLabels: Record<string, string> = {
   venuja1: "VenuJA1",
   krishnaja1: "KrishnaJA1",
   udayja1: "UdayJA1",
+  shasheeja1: "ShasheeJA1",
+  rajja1: "RajJA1",
 };
 
 export default function JobsPage() {
