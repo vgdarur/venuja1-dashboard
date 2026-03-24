@@ -3,8 +3,14 @@ import type { Express, Request, Response, NextFunction } from "express";
 import session from "express-session";
 import MemoryStore from "memorystore";
 
-// Allowed email — only Venu can access
-const ALLOWED_EMAIL = "vgdarur@gmail.com";
+// Allowed emails — team members who can access the dashboard
+const ALLOWED_EMAILS = [
+  "vgdarur@gmail.com",          // Venu (Boss)
+  "udaykcdec@gmail.com",        // Uday
+  "ankitkamra1920@gmail.com",   // Ankit
+  "pavansurya2701@gmail.com",   // Surya
+  "vamshinn@beforeyousolutions.com", // Vamshi
+];
 
 // API key for programmatic access (VenuJA1 cron job)
 // Must be set via VENUJA1_API_KEY environment variable
@@ -71,7 +77,7 @@ export function setupAuth(app: Express) {
       }
 
       // Check if the email is allowed
-      if (payload.email.toLowerCase() !== ALLOWED_EMAIL.toLowerCase()) {
+      if (!ALLOWED_EMAILS.map(e => e.toLowerCase()).includes(payload.email.toLowerCase())) {
         return res.status(403).json({
           message: "Access denied. Only authorized users can access this dashboard.",
         });
