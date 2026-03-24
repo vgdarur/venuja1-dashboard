@@ -53,7 +53,7 @@ const AGENT_DETAILS: Record<string, { candidate: string; type: string }> = {
   udayja1: { candidate: "Uday Kumar Chitturi", type: "C2C Contract · Atlanta + Remote + USA" },
   shasheeja1: { candidate: "Shashi Kumar", type: "C2C Contract · DevOps/SRE" },
   rajja1: { candidate: "Raja Vamshi", type: "C2C Contract · Java Fullstack" },
-  dunteesja1: { candidate: "Dunteesh", type: "C2C Contract · DevOps Engineer" },
+  dunteesja1: { candidate: "Dunteesh", type: "C2C Contract · Python Developer" },
   purvaja1: { candidate: "Purva", type: "C2C Contract · Technical Writer" },
   ramanaja1: { candidate: "Ramana", type: "C2C Contract · React Developer" },
 };

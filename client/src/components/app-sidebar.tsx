@@ -25,7 +25,7 @@ const AGENT_INFO: Record<string, { label: string; candidate: string; type: strin
   udayja1: { label: "UdayJA1", candidate: "Uday Kumar Chitturi", type: "C2C Contract", color: "hsl(38 92% 50%)" },
   shasheeja1: { label: "ShasheeJA1", candidate: "Shashi Kumar", type: "C2C DevOps/SRE", color: "hsl(340 75% 55%)" },
   rajja1: { label: "RajJA1", candidate: "Raja Vamshi", type: "C2C Java Fullstack", color: "hsl(200 80% 50%)" },
-  dunteesja1: { label: "DunteesJA1", candidate: "Dunteesh", type: "C2C DevOps Engineer", color: "hsl(25 90% 55%)" },
+  dunteesja1: { label: "DunteesJA1", candidate: "Dunteesh", type: "C2C Python Developer", color: "hsl(25 90% 55%)" },
   purvaja1: { label: "PurvaJA1", candidate: "Purva", type: "C2C Technical Writer", color: "hsl(290 70% 55%)" },
   ramanaja1: { label: "RamanaJA1", candidate: "Ramana", type: "C2C React Developer", color: "hsl(150 70% 45%)" },
 };
