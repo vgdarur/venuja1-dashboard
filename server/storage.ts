@@ -30,6 +30,10 @@ export class PgStorage implements IStorage {
       connectionString: databaseUrl,
       ssl: { rejectUnauthorized: false },
     });
+    // Use venuja1 schema so jobs go into venuja1.jobs not public.jobs
+    pool.on('connect', (client) => {
+      client.query('SET search_path TO venuja1,public');
+    });
     this.db = drizzle(pool);
   }
 
