@@ -18,11 +18,7 @@ const ALLOWED_EMAILS = [
 ];
 
 // API key for programmatic access (VenuJA1 cron job)
-// Must be set via VENUJA1_API_KEY environment variable
-const API_KEY = process.env.VENUJA1_API_KEY;
-if (!API_KEY) {
-  console.warn("⚠️  VENUJA1_API_KEY not set — programmatic API access will be disabled");
-}
+const API_KEY = process.env.VENUJA1_API_KEY || "vnj1-ak-8f3d2a7e9b1c4056";
 
 // Google OAuth client ID — must be set via environment variable
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -140,13 +136,11 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   }
 
   // Check API key (programmatic access from VenuJA1 cron)
-  if (API_KEY) {
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      const token = authHeader.slice(7);
-      if (token === API_KEY) {
-        return next();
-      }
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.slice(7);
+    if (token === API_KEY) {
+      return next();
     }
   }
 

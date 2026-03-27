@@ -74,12 +74,14 @@ export async function registerRoutes(
     try {
       const parsed = insertJobSchema.safeParse(req.body);
       if (!parsed.success) {
+        console.error("Job validation failed:", JSON.stringify(parsed.error.errors));
         return res.status(400).json({ message: "Invalid job data", errors: parsed.error.errors });
       }
       const job = await storage.createJob(parsed.data);
       res.status(201).json(job);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to create job" });
+    } catch (error: any) {
+      console.error("Failed to create job:", error.message, error.stack);
+      res.status(500).json({ message: "Failed to create job", detail: error.message });
     }
   });
 

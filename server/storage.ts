@@ -24,17 +24,53 @@ export interface IStorage {
 
 export class PgStorage implements IStorage {
   private db;
+  private pool: pg.Pool;
+  private initialized = false;
 
   constructor(databaseUrl: string) {
-    const pool = new Pool({
+    this.pool = new Pool({
       connectionString: databaseUrl,
       ssl: { rejectUnauthorized: false },
     });
     // Use venuja1 schema so jobs go into venuja1.jobs not public.jobs
-    pool.on('connect', (client) => {
+    this.pool.on('connect', (client) => {
       client.query('SET search_path TO venuja1,public');
     });
-    this.db = drizzle(pool);
+    this.db = drizzle(this.pool);
+    // Auto-create schema and table on startup
+    this.ensureTable().catch((err) => console.error("Failed to initialize DB:", err.message));
+  }
+
+  private async ensureTable() {
+    if (this.initialized) return;
+    try {
+      const client = await this.pool.connect();
+      try {
+        await client.query('CREATE SCHEMA IF NOT EXISTS venuja1');
+        await client.query(`
+          CREATE TABLE IF NOT EXISTS venuja1.jobs (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            company TEXT NOT NULL,
+            location TEXT NOT NULL,
+            salary_range TEXT,
+            match_score INTEGER NOT NULL,
+            status TEXT NOT NULL DEFAULT 'pending',
+            job_url TEXT,
+            applied_date TIMESTAMP,
+            created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+            notes TEXT,
+            agent TEXT NOT NULL DEFAULT 'venuja1'
+          )
+        `);
+        this.initialized = true;
+        console.log('✅ venuja1.jobs table ready');
+      } finally {
+        client.release();
+      }
+    } catch (err: any) {
+      console.error('DB init error:', err.message);
+    }
   }
 
   async getJobs(status?: string, agent?: string): Promise<Job[]> {
